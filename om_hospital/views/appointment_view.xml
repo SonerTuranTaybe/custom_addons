@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    <!--Model Sayfası List Görünüm Oluşturma-->
+    <record id="view_hospital_appointment_tree" model="ir.ui.view">
+        <field name="name">hospital.appointment.tree</field>
+        <field name="model">hospital.appointment</field>
+        <field name="arch" type="xml">
+            <tree create="0" decoration-success="state  == 'done'" decoration-danger="state  == 'cancel'">
+                <field name="patient_id"/>
+                <!--Many2one User Avatarını göster
+                <field name="doctor_id" widget="many2one_avatar"/>-->
+                <!--Many2one User Avatarını göster ve mesajlaşmaya izin ver-->
+                <field name="doctor_id" widget="many2one_avatar_user"/>
+                <field name="ref" optional="hide"/>
+                <field name="gender" optional="hide"/>
+                <field name="appointment_time"/>
+                <field name="booking_date" optional="show"/>
+                <!--List Activity (Listede Planları göster)-->
+                <field name="activity_ids" widget="list_activity"/>
+                <!--Badge Widget (Rozet Widget için Dekorasyonlar)-->
+                <field name="state"
+                       widget="badge"
+                       decoration-success="state  == 'done'"
+                       decoration-warning="state  == 'in_consultation'"
+                       decoration-danger="state  == 'cancel'"
+                       decoration-info="state in ('draft')"
+                />
+            </tree>
+        </field>
+    </record>
+
+
+    <!--Model Ekleme ve Düzenleme Formu oluşturma-->
+    <record id="view_hospital_appointment_form" model="ir.ui.view">
+        <field name="name">hospital.appointment.form</field>
+        <field name="model">hospital.appointment</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_in_consultation" string="In Consultation" type="object"
+                            states="draft" class="oe_highlight" data-hotkey="x"/>
+                    <button name="action_done" string="Mark As Done" type="object" states="in_consultation"
+                            class="oe_highlight" data-hotkey="v"/>
+                    <button name="action_cancel" string="Cancel" type="object" states="draft,in_consultation" data-hotkey="z"/>
+                    <button name="action_draft" string="Reset To Draft" type="object" states="cancel" data-hotkey="r"/>
+                    <field name="state" widget="statusbar" nolabel="1" options="{'clickable': '1'}" statusbar_visible="draft,in_consultation,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="priority" widget="priority" class="mr-3"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="patient_id"/>
+                            <field name="ref"/>
+                            <field name="gender"/>
+                            <!--Many2one User Avatarını göster-->
+                            <field name="doctor_id" widget="many2one_avatar"/>
+                            <field name="booking_date"/>
+                        </group>
+                        <group>
+                            <field name="appointment_time"/>
+                            <!-- Button Ekleme (object|action) -->
+                            <button name="action_test" string="Test Button" type="object" class="oe_highlight" help="Button için önizleme mesajı"/>
+                            <button name="%(om_hospital.action_hospital_patient)d" string="Test Button" type="action" class="oe_highlight" help="Button için önizleme mesajı"/>
+                        </group>
+                    </group>
+
+                    <!--Kayıt Görüntüleme, Düzenleme veya ekleme formuna not alanı ekleme-->
+                    <notebook>
+                        <page string="Prescription" name="prescription">
+                            <field name="prescription" placeholder="Enter your prescription"
+                            options="{'collaborative': true,'resizable': true}"/>
+                        </page>
+                        <!-- One2many için alan oluşturma -->
+                        <page string="Pharmacy" name="pharmacy">
+                            <field name="pharmacy_line_ids">
+                                <tree>
+                                    <field name="product_id"/>
+                                    <field name="price_unit"/>
+                                    <field name="qty"/>
+                                </tree>
+                                <form>
+                                    <group>
+                                        <field name="product_id"/>
+                                        <field name="price_unit"/>
+                                        <field name="qty"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
+
+                </sheet>
+                <!-- Chatter -->
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" groups="base.group_user"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!--Arama ve filtreleme-->
+    <record id="view_hospital_appointment_search" model="ir.ui.view">
+        <field name="name">hospital.appointment.search</field>
+        <field name="model">hospital.appointment</field>
+        <field name="arch" type="xml">
+            <search>
+
+            </search>
+        </field>
+    </record>
+
+    <!--Window Action- Sayfa oluşturma-->
+    <record id="action_hospital_appointment" model="ir.actions.act_window">
+        <field name="name">Appointment</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hospital.appointment</field>
+        <field name="view_mode">tree,form</field>
+        <!--Otomatik Filtre atamak-->
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first appointment !
+            </p>
+        </field>
+    </record>
+
+
+    <!--Bu menu action_hospital_appointment dosyasına yönleneceği için önce dosyanın oluşturulması gerektiğinden dolayı bu işlemin arkasına alınmıştır.-->
+    <menuitem id="menu_appointment"
+              name="Appointments"
+              action="action_hospital_appointment"
+              parent="menu_appointment_master"
+              sequence="100"/>
+
+
+</odoo>

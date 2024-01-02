@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    <!--Model Sayfası List Görünüm Oluşturma-->
+    <record id="view_hospital_patient_tree" model="ir.ui.view">
+        <field name="name">hospital.patient.tree</field>
+        <field name="model">hospital.patient</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" string="Patient Name"/>
+                <field name="ref"/>
+                <field name="age"/>
+                <field name="gender"/>
+            </tree>
+        </field>
+    </record>
+
+
+    <!--Model Ekleme ve Düzenleme Formu oluşturma-->
+    <record id="view_hospital_patient_form" model="ir.ui.view">
+        <field name="name">hospital.patient.form</field>
+        <field name="model">hospital.patient</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button  string="Header Button" />
+                    <button class="oe_highlight"  string="Header Button2" />
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="date_of_birth"/>
+                            <field name="calculated_age"/>
+                            <field name="appointment_id"/>
+                        </group>
+                        <group>
+                            <field name="age"/>
+                            <field name="ref"/>
+                            <field name="gender"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <!-- Chatter -->
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" groups="base.group_user"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!--Arama ve filtreleme-->
+    <record id="view_hospital_patient_search" model="ir.ui.view">
+        <field name="name">hospital.patient.search</field>
+        <field name="model">hospital.patient</field>
+        <field name="arch" type="xml">
+            <search>
+                <!--Çoklu Arama -->
+                <field name="name" string="Name | Referance"
+                       filter_domain="['|',('name','ilike',self),('ref','ilike',self)]"/>
+                <!--Tekli Arama -->
+                <field name="name" string="Name"/>
+                <field name="ref" string="Referance"/>
+                <!--Default Filter için filtre hazırlama -->
+                <filter name="filter_default" string="Default Filter"
+                        domain="['|',('gender','=','female'),('gender','=','male')]"/>
+                <!--Filtreleme Çoklu seçim-->
+                <filter name="filter_male" string="Male" domain="[('gender','=','male')]"/>
+                <filter name="filter_female" string="Female" domain="[('gender','=','female')]"/>
+                <!--Filtreleme Tekli Seçim-->
+                <separator/>
+                <filter name="filter_kids" string="Kids" domain="[('age','&lt;=',5)]"/>
+                <separator/>
+                <filter name="filter_archived" string="Archived" domain="[('active','=',False)]"/>
+                <!--Group By Ekleme-->
+                <group expand="0" string="Group By">
+                    <filter name="group_ny_gender" string="Gender" context="{'group_by':'gender'}"/>
+                </group>
+                <searchpanel>
+                    <field name="gender" select="multi" color="#32CD32" enable_counters="1" icon="fa-users"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+
+    <!--Window Action- Sayfa oluşturma-->
+    <record id="action_hospital_patient" model="ir.actions.act_window">
+        <field name="name">Patients</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hospital.patient</field>
+        <field name="view_mode">tree,form</field>
+        <!--Otomatik Filtre atamak-->
+        <field name="context">{'search_default_filter_default':1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first patient !
+            </p>
+        </field>
+    </record>
+
+
+    <!--Bu menu action_hospital_patient dosyasına yönleneceği için önce dosyanın oluşturulması gerektiğinden dolayı bu işlemin arkasına alınmıştır.-->
+    <menuitem id="menu_patient"
+              name="Patients"
+              action="action_hospital_patient"
+              parent="menu_patient_master"
+              sequence="0"/>
+
+
+</odoo>
