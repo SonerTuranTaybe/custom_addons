@@ -4,6 +4,7 @@ from odoo import api, fields, models
 from datetime import date
 
 
+
 class HospitalPatient(models.Model):
     _name = "hospital.patient"
     _inherit = ['mail.thread', 'mail.activity.mixin']
@@ -20,6 +21,8 @@ class HospitalPatient(models.Model):
     gender = fields.Selection([('male', 'Male'), ('female', 'Female')], string="Gender")
     active = fields.Boolean(string="Active", default=True)
     appointment_id = fields.Many2one('hospital.appointment', string="Appointment")
+    image = fields.Image(string="Image")
+    tag_ids = fields.Many2many('patient.tag', string="Tags")
 
     # compute kullanımı model de bulunan field için değer sağlanması (@decarator= anlık değşim gözlenmesi için)
     @api.depends('date_of_birth')

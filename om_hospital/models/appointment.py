@@ -28,6 +28,7 @@ class HospitalAppointment(models.Model):
         ('cancel', 'Cancel')], default='draft', string="Status", required=True)
     doctor_id = fields.Many2one('res.users', string='Doctor', tracking=True)
     pharmacy_line_ids = fields.One2many('appointment.pharmacy.lines', 'appointment_id', string="Pharmacy Lines")
+    hide_sales_price = fields.Boolean(string="Hide Sales Price", default=False)
 
     # Diğer tablodan  seçilen patient_id ye göre veri çekme (anlık güncelleme)
     @api.onchange('patient_id')
@@ -54,9 +55,13 @@ class HospitalAppointment(models.Model):
         for rec in self:
             rec.state = 'done'
 
+    #def action_cancel(self):
+    #    for rec in self:
+    #        rec.state = 'cancel'
+
     def action_cancel(self):
-        for rec in self:
-            rec.state = 'cancel'
+        action = self.env.ref('om_hospital.action_cancel_appointment').read()[0]
+        return action
 
     def action_draft(self):
         for rec in self:
@@ -66,7 +71,7 @@ class AppointmentPharmacyLines(models.Model):
     _name = "appointment.pharmacy.lines"
     _description = "Appointment Pharmacy Lines"
 
-    product_id = fields.Many2one('product.product')
-    price_unit = fields.Float(string="Price")
-    qty = fields.Integer(string="Quantity")
+    product_id = fields.Many2one('product.product', required=True)
+    price_unit = fields.Float(string="Price", related='product_id.list_price')
+    qty = fields.Integer(string="Quantity", default=1)
     appointment_id = fields.Many2one('hospital.appointment', string='Appointment')

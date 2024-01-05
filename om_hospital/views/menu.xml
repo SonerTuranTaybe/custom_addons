@@ -8,15 +8,25 @@
     <menuitem id="menu_patient_master"
               name="Patient Details"
               parent="menu_hospital_root"
-              sequence="1"/>
+              sequence="0"/>
     <menuitem id="menu_appointment_master"
               name="Appointments"
               parent="menu_hospital_root"
-              sequence="2"/>
+              sequence="20"/>
+    <menuitem id="menu_configuration_master"
+              name="Configurations"
+              parent="menu_hospital_root"
+              sequence="100"/>
     <menuitem id="menu_report_master"
               name="Reports"
               parent="menu_hospital_root"
-              sequence="3"/>
+              sequence="200"/>
+
+    <menuitem id="menu_cancel_appointment"
+              name="Cancellation"
+              parent="menu_appointment_master"
+              action="action_cancel_appointment"
+              sequence="20"/>
 
     <!--Bu menu action_hospital_patient dosyasına önleneceği için önce dosyanın oluşturulması gerektiğinden dolayı bu işlemin arkasına alınmıştır.
     <menuitem id="menu_patient"

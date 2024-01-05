@@ -12,11 +12,15 @@
     'depends': ['base_setup', 'product', 'analytic', 'portal', 'digest', 'mail'],
     'data': [
         'security/ir.model.access.csv',
+        'data/patient_tag_data.xml',
+        'data/patient.tag.csv',
+        'wizard/cancel_appointment_view.xml',
         'views/menu.xml',
         'views/patient_view.xml',
         'views/female_patient_view.xml',
         'views/male_patient_view.xml',
         'views/appointment_view.xml',
+        'views/patient_tag_view.xml',
         'views/report_view.xml',
         "reports/report.xml",
         "reports/patient_card.xml"

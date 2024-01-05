@@ -12,6 +12,7 @@
                 <field name="ref"/>
                 <field name="age"/>
                 <field name="gender"/>
+                <field name="tag_ids" widget="many2many_tags" options="{'color_field':'color'}"/>
             </tree>
         </field>
     </record>
@@ -24,10 +25,11 @@
         <field name="arch" type="xml">
             <form>
                 <header>
-                    <button  string="Header Button" />
-                    <button class="oe_highlight"  string="Header Button2" />
+                    <button string="Header Button"/>
+                    <button class="oe_highlight" string="Header Button2"/>
                 </header>
                 <sheet>
+                    <field name="image" widget="image" class="oe_avatar"/>
                     <group>
                         <group>
                             <field name="name"/>
@@ -39,6 +41,7 @@
                             <field name="age"/>
                             <field name="ref"/>
                             <field name="gender"/>
+                            <field name="tag_ids" widget="many2many_tags" options="{'color_field':'color'}"/>
                             <field name="active" invisible="1"/>
                         </group>
                     </group>
