@@ -5,6 +5,7 @@ class HospitalAppointment(models.Model):
     _name = "hospital.appointment"
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = "Hospital Appointment"
+    _ref = 'ref'
 
     # Kayıt adını diğer tablodan gelen değerden alır. Çünkü name alanı yok ve _rec_name tanımlanmış
     _rec_name = "patient_id"
