@@ -7,8 +7,9 @@ class HospitalAppointment(models.Model):
     _description = "Hospital Appointment"
     _ref = 'ref'
 
+    name = fields.Char(string='Name', tracking=True, readonly=True)
     # Kayıt adını diğer tablodan gelen değerden alır. Çünkü name alanı yok ve _rec_name tanımlanmış
-    _rec_name = "patient_id"
+    _rec_name = "name"
     patient_id = fields.Many2one('hospital.patient', string="Patient")
     # Diğer tablodan related ile  veri çekme (readonly=değiştirilebilirlik kazandırır)
     gender = fields.Selection([('male', 'Male'), ('female', 'Female')], string="Gender", related='patient_id.gender',
@@ -30,6 +31,19 @@ class HospitalAppointment(models.Model):
     doctor_id = fields.Many2one('res.users', string='Doctor', tracking=True)
     pharmacy_line_ids = fields.One2many('appointment.pharmacy.lines', 'appointment_id', string="Pharmacy Lines")
     hide_sales_price = fields.Boolean(string="Hide Sales Price", default=False)
+
+
+    # Form'daki Save (Create) Butonunu Inherit Alma
+    # formdaki save butonunu inherit alıyoruz
+    # buradaki vals form' a create anında gönderilen verileri içerir.
+    @api.model
+    def create(self, vals):
+        vals['name'] = self.env['ir.sequence'].next_by_code('hospital.appointment')
+        return super(HospitalAppointment, self).create(vals)
+    def write(self, vals):
+        if not self.name and not vals.get('name'):
+            vals['name'] = self.env['ir.sequence'].next_by_code('hospital.appointment')
+        return super(HospitalAppointment, self).write(vals)
 
     # Diğer tablodan  seçilen patient_id ye göre veri çekme (anlık güncelleme)
     @api.onchange('patient_id')

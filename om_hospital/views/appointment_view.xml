@@ -29,6 +29,7 @@
         <field name="model">hospital.appointment</field>
         <field name="arch" type="xml">
             <tree create="0" decoration-success="state  == 'done'" decoration-danger="state  == 'cancel'">
+                <field name="name" string="Sequence"/>
                 <field name="patient_id"/>
                 <!--Many2one User Avatarını göster
                 <field name="doctor_id" widget="many2one_avatar"/>-->
@@ -64,10 +65,14 @@
                             states="draft" class="oe_highlight" data-hotkey="x"/>
                     <button name="action_done" string="Mark As Done" type="object" states="in_consultation"
                             class="oe_highlight" data-hotkey="v"/>
-                    <button name="action_cancel" string="Cancel" type="object" states="draft,in_consultation"
+
+                    <button name="%(om_hospital.action_cancel_appointment)d" string="Cancel" type="action" states="draft,in_consultation"
+                            context="{'default_appointment_id':active_id,'default_reason':'Test', 'hide_appointment':1}"
                             data-hotkey="z"/>
-                    <!--<button name="%(om_hospital.action_cancel_appointment)d" string="Cancel" type="action" states="draft,in_consultation"
+
+                    <!--<button name="action_cancel" string="Cancel" type="object" states="draft,in_consultation"
                             data-hotkey="z"/>-->
+
                     <button name="action_draft" string="Reset To Draft" type="object" states="cancel" data-hotkey="r"/>
                     <field name="state" widget="statusbar" nolabel="1" options="{'clickable': '1'}"
                            statusbar_visible="draft,in_consultation,done"/>
@@ -75,8 +80,13 @@
                 <sheet>
                     <div class="oe_title">
                         <h1>
-                            <field name="priority" widget="priority" class="mr-3"/>
+                            <field name="name" readonly="1"/>
                         </h1>
+                    </div>
+                    <div>
+                        <h2>
+                            <field name="priority" widget="priority" class="mr-3"/>
+                        </h2>
                     </div>
                     <group>
                         <group>

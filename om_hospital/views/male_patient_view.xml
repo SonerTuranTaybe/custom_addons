@@ -8,7 +8,7 @@
         <field name="res_model">hospital.patient</field>
         <field name="view_mode">tree,form</field>
         <!--Create işleminde cinsiyet seçimini default male yapar-->
-        <field name="context">{'default_gender':'male'}</field>
+        <field name="context">{'default_gender':'male','hide_gender':1}</field>
         <!--Sayfa içeriğini belirler-->
         <field name="domain">[('gender','=','male')]</field>
         <field name="help" type="html">

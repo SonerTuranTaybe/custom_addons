@@ -23,6 +23,7 @@
         'views/appointment_view.xml',
         'views/patient_tag_view.xml',
         'views/report_view.xml',
+        'views/odoo_playground_view.xml',
         "reports/report.xml",
         "reports/patient_card.xml"
     ],
