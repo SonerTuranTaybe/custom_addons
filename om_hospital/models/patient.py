@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from datetime import date
+from odoo.exceptions import ValidationError
 
 
 class HospitalPatient(models.Model):
@@ -22,7 +23,33 @@ class HospitalPatient(models.Model):
     appointment_id = fields.Many2one('hospital.appointment', string="Appointment")
     image = fields.Image(string="Image")
     tag_ids = fields.Many2many('patient.tag', string="Tags")
-    appointment_count = fields.Integer(string='Appointment Count')
+    appointment_count = fields.Integer(string='Appointment Count', compute='_compute_appointment_count', store=True)
+    appointment_ids = fields.One2many('hospital.appointment', 'patient_id', string='Appointment')
+    parent = fields.Char(string="Parent")
+    marital_status = fields.Selection([('married', 'Married'), ('single', 'Single')], string="Marial Status", tracking=True)
+    partner_name = fields.Char(string="Partner Name")
+
+    # @api.depends --> belirtilen değer her değiştiğinde tekrardan _compute için çalışacak, hesaplama yapacak
+    # store=True yapısı DB ye kaydedilmesini sağlar. Bu yüzden her defasında yeniden hesaplama olmaz bunun için api dependsd kullandık
+    # store=True kullanmasaydık DB ye kaydetmeyecekti bunun için @api.depends e de gerek kalmazdı
+    # @api.depends in çalışması için değişen bir yapı olduğunda çalışması gerekir bunun için appointment_ids field i oluşturulmuştur.
+    @api.depends('appointment_ids')
+    def _compute_appointment_count(self):
+        for rec in self:
+            rec.appointment_count = self.env['hospital.appointment'].search_count([('patient_id', '=', rec.id)])
+
+    #contrains decorator' ü ile date of birth alanına kısıtlama ekledik (hastanın doğum tarihi güncel zamandan büyük olamaz)
+    @api.constrains('date_of_birth')
+    def _check_date_of_birth(self):
+        for rec in self:
+            if rec.date_of_birth and rec.date_of_birth > fields.Date.today():
+                raise ValidationError(_("The entered date of birth is not acceptable !"))
+
+    @api.ondelete(at_uninstall=False)
+    def _check_appointments(self):
+        for rec in self:
+            if rec.appointment_ids:
+                raise ValidationError(_("You cannot delete a patient with appointments !"))
 
     # Form'daki Save (Create) Butonunu Inherit Alma
     # formdaki save butonunu inherit alıyoruz
@@ -48,5 +75,6 @@ class HospitalPatient(models.Model):
                 rec.calculated_age = 1
 
 
+    #Model ile ilişki kurulurken _rec değerini name_get ile inherit etme -> " [HP001] Soner "
     def name_get(self):
         return [(record.id, "[%s] %s" % (record.ref, record.name)) for record in self]

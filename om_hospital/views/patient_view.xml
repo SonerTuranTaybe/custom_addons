@@ -7,7 +7,7 @@
         <field name="name">hospital.patient.tree</field>
         <field name="model">hospital.patient</field>
         <field name="arch" type="xml">
-            <tree>
+            <tree export_xlsx="0">
                 <field name="name" string="Patient Name"/>
                 <field name="ref"/>
                 <field name="age"/>
@@ -30,19 +30,36 @@
                 </header>
                 <sheet>
                     <field name="image" widget="image" class="oe_avatar"/>
+                    <div class="oe_title">
+                        <h4>
+                            <field name="ref" readonly="1"/>
+                        </h4>
+                        <h2>
+                            <!--class="oe_edit_only" sadece editleme anında bunu görünür yap-->
+                            <label for="name" string="Name" class="oe_edit_only"/>
+                            <field name="name"/>
+                        </h2>
+                    </div>
                     <group>
                         <group>
-                            <field name="name"/>
                             <field name="date_of_birth"/>
                             <field name="calculated_age"/>
+                            <field name="appointment_count"/>
                             <field name="appointment_id"/>
                         </group>
                         <group>
                             <field name="age"/>
-                            <field name="ref"/>
                             <field name="gender" invisible="context.get('hide_gender')"/>
                             <field name="tag_ids" widget="many2many_tags" options="{'color_field':'color'}"/>
                             <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Other Information" name="other_info">
+                        <group>
+                            <field name="parent" attrs="{'invisible':[('calculated_age', '&gt;=', 18)]}"/>
+                            <field name="marital_status" attrs="{'invisible':[('calculated_age', '&lt;=', 18)]}"/>
+                            <field name="partner_name" attrs="{'readonly':[('marital_status', '!=', 'married')],
+                            'required':[('marital_status', '=', 'married')]}"/>
                         </group>
                     </group>
                 </sheet>

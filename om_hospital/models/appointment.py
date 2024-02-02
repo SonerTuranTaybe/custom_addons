@@ -1,4 +1,5 @@
-from odoo import api, fields, models
+from odoo import api, fields, models, _
+from odoo.exceptions import ValidationError
 
 
 class HospitalAppointment(models.Model):
@@ -10,7 +11,9 @@ class HospitalAppointment(models.Model):
     name = fields.Char(string='Name', tracking=True, readonly=True)
     # Kayıt adını diğer tablodan gelen değerden alır. Çünkü name alanı yok ve _rec_name tanımlanmış
     _rec_name = "name"
-    patient_id = fields.Many2one('hospital.patient', string="Patient")
+    # ondelete='restrict' --> patient deki bağlı olduğu ilgili kaydın silinmesine izin vermez hata verir (çünkü bu kayıt ona bağlı)
+    # ondelete='cascade' --> patient deki kayıt silindiğinde appointment daki ilgili kayıtları siler. Tam tersini de yapabilir.
+    patient_id = fields.Many2one('hospital.patient', string="Patient", ondelete='restrict')
     # Diğer tablodan related ile  veri çekme (readonly=değiştirilebilirlik kazandırır)
     gender = fields.Selection([('male', 'Male'), ('female', 'Female')], string="Gender", related='patient_id.gender',
                               readonly=False)
@@ -45,6 +48,13 @@ class HospitalAppointment(models.Model):
             vals['name'] = self.env['ir.sequence'].next_by_code('hospital.appointment')
         return super(HospitalAppointment, self).write(vals)
 
+    # Silme işlemini inherit alma
+    # silme işlemi için sadece draft olanları gerçekleştir
+    def unlink(self):
+        if self.state != 'draft':
+            raise ValidationError(_("You can delete appoinment only in 'Draft' status !"))
+        return super(HospitalAppointment, self).unlink()
+
     # Diğer tablodan  seçilen patient_id ye göre veri çekme (anlık güncelleme)
     @api.onchange('patient_id')
     def onchange_patient_id(self):
@@ -64,7 +74,8 @@ class HospitalAppointment(models.Model):
 
     def action_in_consultation(self):
         for rec in self:
-            rec.state = 'in_consultation'
+            if rec.state == 'draft':
+                rec.state = 'in_consultation'
 
     def action_done(self):
         for rec in self:

@@ -29,6 +29,9 @@
         <field name="model">hospital.appointment</field>
         <field name="arch" type="xml">
             <tree create="0" decoration-success="state  == 'done'" decoration-danger="state  == 'cancel'">
+                <header>
+                    <button name="action_in_consultation" string="In Consultation" type="object"/>
+                </header>
                 <field name="name" string="Sequence"/>
                 <field name="patient_id"/>
                 <!--Many2one User Avatarını göster
@@ -47,8 +50,12 @@
                        decoration-success="state  == 'done'"
                        decoration-warning="state  == 'in_consultation'"
                        decoration-danger="state  == 'cancel'"
-                       decoration-info="state in ('draft')"
-                />
+                       decoration-info="state in ('draft')"/>
+                <button name="action_done" type="object" class="btn-success fa fa-check"
+                        attrs="{'invisible':[('state', '!=', 'in_consultation')]}"/>
+                <button name="%(om_hospital.action_cancel_appointment)d" type="action" class="fa fa-times btn-danger"
+                        attrs="{'invisible':[('state', 'not in', ('draft','in_consultation'))]}"
+                        context="{'default_appointment_id':active_id,'default_reason':'Test', 'hide_appointment':1}"/>
             </tree>
         </field>
     </record>
