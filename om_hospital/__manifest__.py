@@ -24,6 +24,7 @@
         'views/patient_tag_view.xml',
         'views/report_view.xml',
         'views/odoo_playground_view.xml',
+        'views/res_config_settings_views.xml',
         "reports/report.xml",
         "reports/patient_card.xml"
     ],

@@ -78,3 +78,7 @@ class HospitalPatient(models.Model):
     #Model ile ilişki kurulurken _rec değerini name_get ile inherit etme -> " [HP001] Soner "
     def name_get(self):
         return [(record.id, "[%s] %s" % (record.ref, record.name)) for record in self]
+
+    def action_test(self):
+        print("clicked")
+        return

@@ -56,6 +56,11 @@
                 <button name="%(om_hospital.action_cancel_appointment)d" type="action" class="fa fa-times btn-danger"
                         attrs="{'invisible':[('state', 'not in', ('draft','in_consultation'))]}"
                         context="{'default_appointment_id':active_id,'default_reason':'Test', 'hide_appointment':1}"/>
+                <!--Patient üzerinden GroupBy yapıldığında gruplanan patient altındaki appointment listesinde edit butonu ile patient editleme sayfasına gidilebilir.-->
+                <groupby name="patient_id">
+                    <button name="action_test" string="Click me" type="object" class="oe_highlight"/>
+                    <button name="edit" string="Edit" type="edit" class="oe_highlight"/>
+                </groupby>
             </tree>
         </field>
     </record>
