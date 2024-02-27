@@ -3,6 +3,7 @@
 from odoo import api, fields, models, _
 from datetime import date
 from odoo.exceptions import ValidationError
+from dateutil import relativedelta
 
 
 class HospitalPatient(models.Model):
@@ -15,7 +16,10 @@ class HospitalPatient(models.Model):
     name = fields.Char(string='Name', tracking=True)
     date_of_birth = fields.Date(string="Date of Birth")
     # bu model değerini bir fonksiyondan alacak
-    calculated_age = fields.Integer(string='Calculated Age', compute="_compute_calculated_age")
+    calculated_age = fields.Integer(string='Calculated Age',
+                                    compute="_compute_calculated_age",
+                                    inverse="_inverse_compute_calculated_age",
+                                    search='_search_calculated_age')
     ref = fields.Char(string='Reference')
     age = fields.Integer(string='Age', tracking=True)
     gender = fields.Selection([('male', 'Male'), ('female', 'Female')], string="Gender", default='male')
@@ -73,6 +77,23 @@ class HospitalPatient(models.Model):
                 rec.calculated_age = today.year - rec.date_of_birth.year
             else:
                 rec.calculated_age = 1
+
+    # Tersine fonksiyon yazmak için
+    @api.depends('calculated_age')
+    def _inverse_compute_calculated_age(self):
+        today = date.today()
+        for rec in self:
+            rec.date_of_birth = today - relativedelta.relativedelta(years=rec.calculated_age)
+
+    #calculated_age değeri compute olup DB ye kaydedilmediği için search kısmında yapılan filtrelemede etki göstermeyeceğinden dolayı...+
+    #DB ye kaydedilmeyen field lar üzerinde arama yapabilmek için bu fonksiyon kullanılır.
+    #buradaki value değeri filtrelemede search için girilen değerdir.
+    def _search_calculated_age(self, operator, value):
+        date_of_birth = date.today() - relativedelta.relativedelta(years=value)
+        start_of_year = date_of_birth.replace(day=1, month=1)
+        end_of_year = date_of_birth.replace(day=31, month=12)
+        return [('date_of_birth', '>=', start_of_year), ('date_of_birth', '<=', end_of_year)]
+
 
 
     #Model ile ilişki kurulurken _rec değerini name_get ile inherit etme -> " [HP001] Soner "

@@ -51,8 +51,9 @@ class HospitalAppointment(models.Model):
     # Silme işlemini inherit alma
     # silme işlemi için sadece draft olanları gerçekleştir
     def unlink(self):
-        if self.state != 'draft':
-            raise ValidationError(_("You can delete appoinment only in 'Draft' status !"))
+        for rec in self:
+            if self.state != 'draft':
+                raise ValidationError(_("You can delete appoinment only in 'Draft' status !"))
         return super(HospitalAppointment, self).unlink()
 
     # Diğer tablodan  seçilen patient_id ye göre veri çekme (anlık güncelleme)

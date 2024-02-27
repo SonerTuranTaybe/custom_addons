@@ -84,6 +84,7 @@
                        filter_domain="['|',('name','ilike',self),('ref','ilike',self)]"/>
                 <!--Tekli Arama -->
                 <field name="name" string="Name"/>
+                <field name="calculated_age" string="Calculated Age"/>
                 <field name="ref" string="Referance"/>
                 <!--Default Filter için filtre hazırlama -->
                 <filter name="filter_default" string="Default Filter"
