@@ -7,6 +7,7 @@ class HospitalAppointment(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = "Hospital Appointment"
     _ref = 'ref'
+    _order = 'id desc'
 
     name = fields.Char(string='Name', tracking=True, readonly=True)
     # Kayıt adını diğer tablodan gelen değerden alır. Çünkü name alanı yok ve _rec_name tanımlanmış
@@ -34,7 +35,9 @@ class HospitalAppointment(models.Model):
     doctor_id = fields.Many2one('res.users', string='Doctor', tracking=True)
     pharmacy_line_ids = fields.One2many('appointment.pharmacy.lines', 'appointment_id', string="Pharmacy Lines")
     hide_sales_price = fields.Boolean(string="Hide Sales Price", default=False)
-
+    operation_id = fields.Many2one('hospital.operation', string='Operation')
+    progress = fields.Integer(string='Progress', compute='_compute_progress')
+    duration = fields.Float(string='Duration')
 
     # Form'daki Save (Create) Butonunu Inherit Alma
     # formdaki save butonunu inherit alıyoruz
@@ -93,6 +96,19 @@ class HospitalAppointment(models.Model):
     def action_draft(self):
         for rec in self:
             rec.state = 'draft'
+
+    @api.depends('state')
+    def _compute_progress(self):
+        for rec in self:
+            if rec.state == 'draft':
+                progress = 25
+            elif rec.state == 'in_consultation':
+                progress = 50
+            elif rec.state == 'done':
+                progress = 100
+            else:
+                progress = 0
+            rec.progress = progress
 
 class AppointmentPharmacyLines(models.Model):
     _name = "appointment.pharmacy.lines"

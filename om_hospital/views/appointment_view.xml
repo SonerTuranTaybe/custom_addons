@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <!--Server action için button oluşturma-->
+    <record id="action_mark_as_done" model="ir.actions.server">
+        <field name="name">Mark As Done</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_hospital_appointment"/>
+        <field name="binding_model_id" ref="model_hospital_appointment"/>
+        <!--binding_view_types: hangi görünümde görüneceğini belirler-->
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">
+            for record in records:
+                if record.state == 'in_consultation':
+                    record.action_done()
+        </field>
+    </record>
 
     <!--Model Sayfası Aktivite Görünümü Oluşturma-->
     <record id="view_hospital_appointment_activity" model="ir.ui.view">
@@ -22,6 +37,19 @@
         </field>
     </record>
 
+    <!--Model Sayfası Calendar Görünüm Oluşturma-->
+    <record id="view_hospital_appointment_calendar" model="ir.ui.view">
+        <field name="name">hospital.appointment.calendar</field>
+        <field name="model">hospital.appointment</field>
+        <field name="arch" type="xml">
+            <calendar string="Appointment" date_start="booking_date" mode="month"
+                      date_delay="duration" color="patient_id" quick_add="False" hide_time="True" event_open_popup="True"
+                      form_view_id="%(om_hospital.view_hospital_appointment_form)d" event_limit="5">
+                <field name="patient_id" filters="1" avatar_field="image"/>
+                <field name="state" invisible="1" filters="1"/>
+            </calendar>
+        </field>
+    </record>
 
     <!--Model Sayfası List Görünüm Oluşturma-->
     <record id="view_hospital_appointment_tree" model="ir.ui.view">
@@ -61,6 +89,7 @@
                     <button name="action_test" string="Click me" type="object" class="oe_highlight"/>
                     <button name="edit" string="Edit" type="edit" class="oe_highlight"/>
                 </groupby>
+                <field name="progress" widget="progressbar"/>
             </tree>
         </field>
     </record>
@@ -102,12 +131,16 @@
                     </div>
                     <group>
                         <group>
-                            <field name="patient_id"/>
-                            <field name="ref"/>
+                            <!--selection widget many2one field alanının UI da create ve create and edit alanlarının kapanması ve iç bağlantıyı kaldırır-->
+                            <field name="patient_id" widget="selection"/>
+                            <!--force_save alanının amacı readonly olan field' ların kaydedilmemesinden dolayı bu alanı kaydetmeye yarar-->
+                            <field name="ref" readonly="1" force_save="1"/>
                             <field name="gender"/>
                             <!--Many2one User Avatarını göster-->
                             <field name="doctor_id" widget="many2one_avatar"/>
                             <field name="booking_date"/>
+                            <field name="duration"/>
+                            <field name="operation_id"/>
                         </group>
                         <group>
                             <field name="hide_sales_price" groups="base.group_no_one"/>
@@ -123,6 +156,10 @@
 
                     <!--Kayıt Görüntüleme, Düzenleme veya ekleme formuna not alanı ekleme-->
                     <notebook>
+                        <!--Progress bar için widget widget="progressbar", widget="gauge", widget="percentpie"-->
+                        <page string="Progress" name="progress">
+                            <field name="progress" widget="gauge" />
+                        </page>
                         <page string="Prescription" name="prescription">
                             <field name="prescription" placeholder="Enter your prescription"
                                    options="{'collaborative': true,'resizable': true,'codeview':true}"/>
@@ -176,7 +213,7 @@
         <field name="name">Appointment</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">hospital.appointment</field>
-        <field name="view_mode">tree,form,activity</field>
+        <field name="view_mode">tree,form,calendar,activity</field>
         <!--Otomatik Filtre atamak-->
         <field name="context">{}</field>
         <field name="help" type="html">
