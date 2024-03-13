@@ -26,10 +26,30 @@ class CancelAppointmentWizard(models.TransientModel):
 
         allowed_date = self.appointment_id.booking_date - relativedelta.relativedelta(days=int(cancel_day))
         if allowed_date < date.today():
-            raise ValidationError(_("Sorry, cancellation is not allowed for this booking"))
+            raise ValidationError(_("Sorry, cancellation is not allowed for this booking (Tarih sorunu)"))
         self.appointment_id.state = 'cancel'
-        #bu method kullanıldıktan sonra sayfa yenilenir.
+
+        # Database' e doğrudan erişerek işlem yapma
+        query = """select name from hospital_patient"""
+        self.env.cr.execute(query)
+        #patients = self.env.cr.fetchall()
+        # kayıtları dict formatında döner
+        #patients = self.env.cr.dictfetchall()
+        # dictfetchallone sadece 1 adet kayıt döner
+        patients = self.env.cr.dictfetchallone()
+        print('patients----->', patients)
+
+        #Bu yapı ile wizard işlemden sonra kapanmıyor bir sonraki işlem için yine ekranda kalıyor
         return {
-            'type': 'ir.actions.client',
-            'tag': 'reload',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'res_model': 'cancel.appointment.wizard',
+            'target': 'new',
+            'res_id': self.id
         }
+
+        #bu method kullanıldıktan sonra sayfa yenilenir.
+        #return {
+        #    'type': 'ir.actions.client',
+        #    'tag': 'reload',
+        #}

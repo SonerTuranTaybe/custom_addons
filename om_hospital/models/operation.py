@@ -7,6 +7,7 @@ class HospitalOperation(models.Model):
     _name = "hospital.operation"
     _description = "Hospital Operation"
     _log_access = False
+    _order = 'sequence,id'
 
     # _log_access alanı create_date, create_uid, write_date, write_uid değerlerini DB' ye eklemez
     # Many2one ile uzaktan create işlemi oluşturmayı kapatır
@@ -16,6 +17,8 @@ class HospitalOperation(models.Model):
     operation_name = fields.Char(string='Name')
     reference_record = fields.Reference(selection=[('hospital.patient', 'Patient'),
                                                    ('hospital.appointment', 'Appointment')], string='Record')
+
+    sequence = fields.Integer(string="Sequence", default=10)
 
     # many2one field' lar ile uzaktan yapılan create işlemini inherit alır
     @api.model

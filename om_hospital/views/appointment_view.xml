@@ -56,7 +56,7 @@
         <field name="name">hospital.appointment.tree</field>
         <field name="model">hospital.appointment</field>
         <field name="arch" type="xml">
-            <tree create="0" decoration-success="state  == 'done'" decoration-danger="state  == 'cancel'">
+            <tree create="1" decoration-success="state  == 'done'" decoration-danger="state  == 'cancel'">
                 <header>
                     <button name="action_in_consultation" string="In Consultation" type="object"/>
                 </header>
@@ -106,7 +106,8 @@
                             states="draft" class="oe_highlight" data-hotkey="x"/>
                     <button name="action_done" string="Mark As Done" type="object" states="in_consultation"
                             class="oe_highlight" data-hotkey="v"/>
-
+                    <button name="action_share_whatsapp" string="Share in Whatsapp" type="object"
+                            class="oe_highlight" data-hotkey="w" icon="fa-whatsapp"/>
                     <button name="%(om_hospital.action_cancel_appointment)d" string="Cancel" type="action" states="draft,in_consultation"
                             context="{'default_appointment_id':active_id,'default_reason':'Test', 'hide_appointment':1}"
                             data-hotkey="z"/>
@@ -145,11 +146,17 @@
                         <group>
                             <field name="hide_sales_price" groups="base.group_no_one"/>
                             <field name="appointment_time"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
                             <!-- Button Ekleme (object|action) -->
-                            <button name="action_test" string="Test Button" type="object" class="oe_highlight"
+                            <button name="action_test" string="Redirect Object Button" type="object" class="oe_highlight"
                                     groups="base.group_no_one"
+                                    confirm="Başka bir sayfaya yönlendiriliyorsunuz?"
                                     help="Button için önizleme mesajı"/>
-                            <button name="%(om_hospital.action_hospital_patient)d" string="Test Button" type="action"
+                            <button name="action_notification" string="Notification Button" type="object"
+                                    class="oe_highlight"
+                                    groups="base.group_no_one"/>
+                            <button name="%(om_hospital.action_hospital_patient)d" string="Action Button" type="action"
                                     class="oe_highlight" groups="base.group_no_one" help="Button için önizleme mesajı"/>
                         </group>
                     </group>
@@ -167,12 +174,16 @@
                         <!-- One2many için alan oluşturma -->
                         <page string="Pharmacy" name="pharmacy">
                             <field name="pharmacy_line_ids">
-                                <!--editable="bottom" => YEni veri ekleme işini pop-up yerine altta mevcut konumdaki satırda gerçekleştirir-->
+                                <!--editable="bottom" => Yeni veri ekleme işini pop-up yerine altta mevcut konumdaki satırda gerçekleştirir-->
                                 <tree editable="bottom">
+                                    <field name="sl_no" readonly="1"/>
                                     <field name="product_id"/>
-                                    <field name="price_unit"
+                                    <field name="price_unit" widget="monetary"
+                                           options="{'currency_field': 'currency_id', 'field_digits': True}"
                                            attrs="{'column_invisible': [('parent.hide_sales_price', '=', True)]}"/>
                                     <field name="qty"/>
+                                    <field name="currency_id" invisible="1"/>
+                                    <field name="price_subtotal" sum="Total"/>
                                 </tree>
                                 <form>
                                     <group>
